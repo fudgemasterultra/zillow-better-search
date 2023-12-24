@@ -1,20 +1,16 @@
-import { DOMMessage, DOMMessageResponse } from '../types/DOMMessages';
+import { DOMMessage, DOMMessageResponse } from "../types/DOMMessages";
 
-const messagesFromReactAppListener = (msg: DOMMessage, sender: chrome.runtime.MessageSender, sendResponse: (response: DOMMessageResponse) => void) => {
-  console.log('[content.js]. Message received', msg);
-
-  const response: DOMMessageResponse = {
-    title: document.title,
-    headlines: Array.from(document.getElementsByTagName<"h1">("h1")).map(h1 => h1.innerText)
-  };
-
-  console.log('[content.js]. Message response', response);
-
-  sendResponse(response)
+function interceptCall(details: chrome.webRequest.WebResponseCacheDetails) {
+  console.log("****************");
+  console.log("body request");
+  console.log(details.url);
+  console.log("****************");
 }
 
-/**
- * Fired when a message is sent from either an extension process or a content script.
- */
-chrome.runtime.onMessage.addListener(messagesFromReactAppListener);
-console.log("does this load?")
+chrome.webRequest.onCompleted.addListener(
+  interceptCall,
+  { urls: ["https://zillow.com/*"], types: ["xmlhttprequest"] },
+  ["responseHeaders"]
+);
+
+console.log("does this load?");
