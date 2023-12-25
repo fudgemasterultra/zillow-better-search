@@ -1,16 +1,29 @@
-import { DOMMessage, DOMMessageResponse } from "../types/DOMMessages";
+// background.ts
 
-function interceptCall(details: chrome.webRequest.WebResponseCacheDetails) {
-  console.log("****************");
-  console.log("body request");
-  console.log(details.url);
-  console.log("****************");
-}
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.declarativeNetRequest.updateDynamicRules({
+    addRules: [
+      {
+        id: 4,
+        priority: 1,
+        action: { type: chrome.declarativeNetRequest.RuleActionType.BLOCK },
+        condition: {
+          urlFilter: "google.com",
+          resourceTypes: [
+            chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST,
+          ],
+        },
+      },
+    ],
+  });
+});
 
-chrome.webRequest.onCompleted.addListener(
-  interceptCall,
-  { urls: ["https://zillow.com/*"], types: ["xmlhttprequest"] },
-  ["responseHeaders"]
-);
+chrome.runtime.onStartup.addListener(() => {
+  chrome.declarativeNetRequest.updateDynamicRules({
+    addRules: [
+      // Add rules if needed on startup
+    ],
+  });
+});
 
-console.log("does this load?");
+export {};
